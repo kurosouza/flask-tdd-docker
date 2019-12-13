@@ -1,5 +1,5 @@
 from sqlalchemy.sql import func
-
+import os
 from project import db
 
 
@@ -13,7 +13,7 @@ class User(db.Model):
     active = db.Column(db.Boolean(), default=True, nullable=False)
     created_date = db.Column(db.DateTime, default=func.now(), nullable=False)
 
-    def __init__(self, username, email):
+    def __init__(self, username="", email=""):
         self.username = username
         self.email = email
 
@@ -24,3 +24,10 @@ class User(db.Model):
             "email": self.email,
             "active": self.active,
         }
+
+
+if os.getenv("FLASK_ENV") == "development":
+    from project import admin
+    from project.api.users.admin import UsersAdminView
+
+    admin.add_view(UsersAdminView(User, db.session))
